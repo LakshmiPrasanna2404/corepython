@@ -1,0 +1,300 @@
+Enter password: ****
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 12
+Server version: 5.5.16 MySQL Community Server (GPL)
+
+Copyright (c) 2000, 2011, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> USE CVR;
+Database changed
+mysql> SHOW TABLES;
++---------------+
+| Tables_in_cvr |
++---------------+
+| customer      |
+| orders        |
+| salesperson   |
+| student       |
+| students      |
++---------------+
+5 rows in set (0.01 sec)
+
+mysql> SELECT * FROM SALESPERSON;
++------+---------+----------+------+
+| snum | sname   | city     | comm |
++------+---------+----------+------+
+| 1001 | peel    | london   | 0.12 |
+| 1002 | serres  | san jose | 0.13 |
+| 1003 | axelrod | new york | 0.10 |
+| 1004 | motika  | london   | 0.11 |
+| 1005 | fran    | london   | 0.26 |
+| 1007 | rifkin  | london   | 0.15 |
++------+---------+----------+------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT * FROM CUSTOMER;
++------+----------+----------+--------+------+
+| cnum | cname    | city     | rating | snum |
++------+----------+----------+--------+------+
+| 2001 | hoffman  | london   |    100 | 1001 |
+| 2002 | giovanni | rome     |    200 | 1003 |
+| 2003 | liu      | san rose |    200 | 1002 |
+| 2004 | grass    | berlin   |    300 | 1002 |
+| 2006 | clemens  | london   |    100 | 1001 |
+| 2007 | pereira  | rome     |    100 | 1004 |
+| 2008 | cisneros | san rose |    300 | 1007 |
++------+----------+----------+--------+------+
+7 rows in set (0.00 sec)
+
+mysql> SELECT * FROM ORDERS;
++------+---------+------------+------+
+| onum | amt     | odate      | cnum |
++------+---------+------------+------+
+| 3001 |   18.69 | 1996-03-10 | 2008 |
+| 3002 | 1900.10 | 1996-10-03 | 2007 |
+| 3003 |  767.19 | 1996-10-03 | 2001 |
+| 3005 | 5160.45 | 1996-10-03 | 2003 |
+| 3006 | 1098.16 | 1996-10-03 | 2008 |
+| 3007 |   75.75 | 1996-10-04 | 2002 |
+| 3008 | 4723.00 | 1996-10-05 | 2006 |
+| 3009 | 1713.23 | 1996-10-04 | 2002 |
+| 3010 | 1309.95 | 1996-10-06 | 2004 |
+| 3011 | 9891.88 | 1996-10-06 | 2006 |
++------+---------+------------+------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     s.snum,
+    ->     s.sname,
+    ->     SUM(o.amt) AS total_sales
+    -> FROM
+    ->     SALESPERSON s
+    -> JOIN
+    ->     CUSTOMER c ON s.snum = c.snum
+    -> JOIN
+    ->     ORDERS o ON c.cnum = o.cnum
+    -> GROUP BY
+    ->     s.snum, s.sname
+    -> ORDER BY
+    ->     total_sales DESC
+    -> LIMIT 1;
++------+-------+-------------+
+| snum | sname | total_sales |
++------+-------+-------------+
+| 1001 | peel  |    15382.07 |
++------+-------+-------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT
+    ->     s.snum,
+    ->     s.sname,
+    ->     COUNT(c.cnum) AS customer_count
+    -> FROM
+    ->     SALESPERSON s
+    -> LEFT JOIN
+    ->     CUSTOMER c ON s.snum = c.snum
+    -> GROUP BY
+    ->     s.snum, s.sname;
++------+---------+----------------+
+| snum | sname   | customer_count |
++------+---------+----------------+
+| 1001 | peel    |              2 |
+| 1002 | serres  |              2 |
+| 1003 | axelrod |              1 |
+| 1004 | motika  |              1 |
+| 1005 | fran    |              0 |
+| 1007 | rifkin  |              1 |
++------+---------+----------------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     c.cnum,
+    ->     c.cname,
+    ->     COUNT(o.onum) AS order_count
+    -> FROM
+    ->     CUSTOMER c
+    -> JOIN
+    ->     ORDERS o ON c.cnum = o.cnum
+    -> GROUP BY
+    ->     c.cnum, c.cname
+    -> ORDER BY
+    ->     order_count DESC
+    -> LIMIT 1;
++------+---------+-------------+
+| cnum | cname   | order_count |
++------+---------+-------------+
+| 2006 | clemens |           2 |
++------+---------+-------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT
+    ->     s.snum,
+    ->     s.sname,
+    ->     AVG(o.amt) AS average_order_size
+    -> FROM
+    ->     SALESPERSON s
+    -> JOIN
+    ->     CUSTOMER c ON s.snum = c.snum
+    -> JOIN
+    ->     ORDERS o ON c.cnum = o.cnum
+    -> GROUP BY
+    ->     s.snum, s.sname;
++------+---------+--------------------+
+| snum | sname   | average_order_size |
++------+---------+--------------------+
+| 1001 | peel    |        5127.356667 |
+| 1002 | serres  |        3235.200000 |
+| 1003 | axelrod |         894.490000 |
+| 1004 | motika  |        1900.100000 |
+| 1007 | rifkin  |         558.425000 |
++------+---------+--------------------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     c.cnum,
+    ->     c.cname,
+    ->     SUM(o.amt) AS total_spent
+    -> FROM
+    ->     CUSTOMER c
+    -> JOIN
+    ->     ORDERS o ON c.cnum = o.cnum
+    -> GROUP BY
+    ->     c.cnum, c.cname
+    -> ORDER BY
+    ->     total_spent DESC
+    -> LIMIT 1;
++------+---------+-------------+
+| cnum | cname   | total_spent |
++------+---------+-------------+
+| 2006 | clemens |    14614.88 |
++------+---------+-------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT
+    ->     c.city,
+    ->     SUM(o.amt) AS total_sales
+    -> FROM
+    ->     CUSTOMER c
+    -> JOIN
+    ->     ORDERS o ON c.cnum = o.cnum
+    -> GROUP BY
+    ->     c.city
+    -> ORDER BY
+    ->     total_sales DESC;
++----------+-------------+
+| city     | total_sales |
++----------+-------------+
+| london   |    15382.07 |
+| san rose |     6277.30 |
+| rome     |     3689.08 |
+| berlin   |     1309.95 |
++----------+-------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     s.snum,
+    ->     s.sname,
+    ->     AVG(c.rating) AS average_rating
+    -> FROM
+    ->     SALESPERSON s
+    -> JOIN
+    ->     CUSTOMER c ON s.snum = c.snum
+    -> GROUP BY
+    ->     s.snum, s.sname
+    -> ORDER BY
+    ->     average_rating DESC
+    -> LIMIT 1;
++------+--------+----------------+
+| snum | sname  | average_rating |
++------+--------+----------------+
+| 1007 | rifkin |       300.0000 |
++------+--------+----------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT
+    ->     s.snum,
+    ->     s.sname,
+    ->     COUNT(DISTINCT o.cnum) * 100.0 / COUNT(DISTINCT c.cnum) AS percentage_customers_with_orders
+    -> FROM
+    ->     SALESPERSON s
+    -> JOIN
+    ->     CUSTOMER c ON s.snum = c.snum
+    -> LEFT JOIN
+    ->     ORDERS o ON c.cnum = o.cnum
+    -> GROUP BY
+    ->     s.snum, s.sname;
++------+---------+----------------------------------+
+| snum | sname   | percentage_customers_with_orders |
++------+---------+----------------------------------+
+| 1001 | peel    |                        100.00000 |
+| 1002 | serres  |                        100.00000 |
+| 1003 | axelrod |                        100.00000 |
+| 1004 | motika  |                        100.00000 |
+| 1007 | rifkin  |                        100.00000 |
++------+---------+----------------------------------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     c.cnum,
+    ->     c.cname,
+    ->     SUM(o.amt) AS total_revenue
+    -> FROM
+    ->     CUSTOMER c
+    -> JOIN
+    ->     ORDERS o ON c.cnum = o.cnum
+    -> GROUP BY
+    ->     c.cnum, c.cname;
++------+----------+---------------+
+| cnum | cname    | total_revenue |
++------+----------+---------------+
+| 2001 | hoffman  |        767.19 |
+| 2002 | giovanni |       1788.98 |
+| 2003 | liu      |       5160.45 |
+| 2004 | grass    |       1309.95 |
+| 2006 | clemens  |      14614.88 |
+| 2007 | pereira  |       1900.10 |
+| 2008 | cisneros |       1116.85 |
++------+----------+---------------+
+7 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     c.cnum,
+    ->     c.cname
+    -> FROM
+    ->     CUSTOMER c
+    -> LEFT JOIN
+    ->     ORDERS o ON c.cnum = o.cnum
+    -> WHERE
+    ->     o.onum IS NULL;
+Empty set (0.00 sec)
+
+mysql> SELECT
+    ->     s.snum,
+    ->     s.sname,
+    ->     SUM(o.amt) * 100.0 / (SELECT SUM(amt) FROM ORDERS) AS revenue_percentage
+    -> FROM
+    ->     SALESPERSON s
+    -> JOIN
+    ->     CUSTOMER c ON s.snum = c.snum
+    -> JOIN
+    ->     ORDERS o ON c.cnum = o.cnum
+    -> GROUP BY
+    ->     s.snum, s.sname;
++------+---------+--------------------+
+| snum | sname   | revenue_percentage |
++------+---------+--------------------+
+| 1001 | peel    |         57.7006497 |
+| 1002 | serres  |         24.2715242 |
+| 1003 | axelrod |          6.7107553 |
+| 1004 | motika  |          7.1275846 |
+| 1007 | rifkin  |          4.1894862 |
++------+---------+--------------------+
+5 rows in set (0.00 sec)
+
+mysql>
