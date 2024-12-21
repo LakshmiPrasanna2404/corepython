@@ -1,0 +1,27 @@
+welfare,education,financial,revenue,employment
+
+
+Education sector------
+1)Male and female literacy rate(Gender and Education)
+2)Literacy rate in each country and schemes accordingly(country and education)
+3)Providing scolarships based on merit(education)
+
+
+welfare sector------
+1)based on parents status providing  welfare schemes for orphans(Parents status)
+2)based on marital status providing schemes for widows(Marital status)
+3)Analysing age of the people and providing schemes for pensions(age)
+4)Providing beneficiary schemes for native citizens(Citizenship)
+
+
+Revenue sector-------
+1)based on income generation filing the tax(Income)
+2)Which education level contributes more revenue(Education)
+3)Analyse the revenue generated from non filers(Tax filling status)
+
+
+employment sector-------
+1)analysing the unemployment rate(no.of weeks working)
+2)Analyse how many people are unemployed and provide schemes for them accordingly(no.of weeks)
+
+
