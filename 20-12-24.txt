@@ -1,0 +1,226 @@
+ insert into students values(1,'gunja srikanth',50,'hyderabad',9398968719,'male');
+ insert into students values(2,'dasari supriya',78,'hyderabad',9398968719,'female');
+ insert into students values(3,'varkala tejasri',10,'hyderabad',9398968719,'female');
+ insert into students values(4,'lavoori varshitha',54,'hyderabad',9398968719,'female');
+ insert into students values(5,'edunuri bhavika',95,'hyderabad',9398968719,'female');
+ insert into students values(6,'bejagam chathan teja',87,'hyderabad',9398968719,'male');
+ insert into students values(7,'c pradeep',82,'hyderabad',9398968719,'male');
+ insert into students values(8,'rachapally nikhitha',87,'bglr',9398968719,'female');
+ insert into students values(9,'mandala nikhitha',82,'hyderabad',9398968719,'female');
+ insert into students values(10,'battula ram gopal',90,'hyderabad',9398968719,'male');
+ insert into students values(11,'bhukya sridhar',77,'pune',9398968719,'male');
+ insert into students values(12,'shiva kumar',75,'pune',9398968719,'male');
+ insert into students values(13,'mounika',75,'pune',9398968719,'female');
+
+
+
+
+
+
+create table customer(cnum int not null, cname varchar(30) not null,city varchar(30) not null, rating int not null, snum int not null, primary key(cnum), foreign key(snum) references salesperson(snum));
+
+
+
+1.find no of custumor for each salesperson
+
+SELECT sp.snum, sp.sname, COUNT(c.cnum) AS num_of_customers FROM salesperson sp LEFT JOIN customer c ON sp.snum = c.snum GROUP BY sp.snum, sp.sname;
+
+2.best salesperson based on customer rating
+
+SELECT snum, sname, MAX(avg_rating) AS best_avg_rating
+FROM (
+    SELECT c.snum, sp.sname, AVG(c.rating) AS avg_rating
+    FROM customer c, salesperson sp
+    WHERE c.snum = sp.snum
+    GROUP BY c.snum, sp.sname
+) AS avg_ratings
+GROUP BY snum, sname
+ORDER BY best_avg_rating DESC
+LIMIT 1;
+
+
+3.to whom we need to fire from salesperson team
+
+SELECT snum, sname, AVG(c.rating) AS avg_rating
+FROM customer c, salesperson sp
+WHERE c.snum = sp.snum
+GROUP BY c.snum, sp.sname
+ORDER BY avg_rating ASC
+LIMIT 1;
+
+
+4.who has less customer rating
+
+SELECT sp.snum, sp.sname, AVG(c.rating) AS avg_rating
+FROM salesperson sp
+JOIN customer c ON sp.snum = c.snum
+GROUP BY sp.snum, sp.sname
+ORDER BY avg_rating ASC
+LIMIT 1;
+
+
+
+
+5.display salesperson who has customer from same city
+
+SELECT DISTINCT sp.snum, sp.sname, sp.city
+FROM salesperson sp
+JOIN customer c ON sp.snum = c.snum
+WHERE sp.city = c.city;
+
+
+6.find the names and numbers of all salesperson who had more than one customer
+
+SELECT sp.snum, sp.sname
+FROM salesperson sp
+JOIN customer c ON sp.snum = c.snum
+GROUP BY sp.snum, sp.sname
+HAVING COUNT(c.cnum) > 1;
+
+
+7.find customers in san jose who have a rating above 200
+
+SELECT c.cnum, c.cname, c.city, c.rating
+FROM customer c
+WHERE c.city = 'San Jose' AND c.rating > 200;
+
+
+8.list all customers with ratings above san jose's average
+
+SELECT c.cnum, c.cname, c.city, c.rating
+FROM customer c
+WHERE c.rating > (
+    SELECT AVG(c1.rating)
+    FROM customer c1
+    WHERE c1.city = 'San Jose'
+);
+
+
+
+
+
+
+
+Enter password: ****
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 5.5.16 MySQL Community Server (GPL)
+
+Copyright (c) 2000, 2011, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql>
+mysql> use cvr;
+Database changed
+mysql> create database reatail;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> create table salesperson(snum int not null,sname varchar(30) not null,city varchar(20) not null,comm decimal(4,2) not null,primary key(snum));
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> insert into salesperson values(1001,peel,london,0.12);
+ERROR 1054 (42S22): Unknown column 'peel' in 'field list'
+mysql> insert into salesperson values(1001,'peel','london',0.12);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into salesperson values(1002,'serres','san jose',0.13);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into salesperson values(1003,'axelrod','new york',0.10);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into salesperson values(1004,'motika','london',0.11);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into salesperson values(1005,'fran','london',0.26);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into salesperson values(1007,'rifkin','london',0.15);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from salesperson;
++------+---------+----------+------+
+| snum | sname   | city     | comm |
++------+---------+----------+------+
+| 1001 | peel    | london   | 0.12 |
+| 1002 | serres  | san jose | 0.13 |
+| 1003 | axelrod | new york | 0.10 |
+| 1004 | motika  | london   | 0.11 |
+| 1005 | fran    | london   | 0.26 |
+| 1007 | rifkin  | london   | 0.15 |
++------+---------+----------+------+
+6 rows in set (0.00 sec)
+
+mysql> create table customer(cnum int not null, cname varchar(30) not null,city varchar(30) not null,rating int not null,snum int not null,primary key(cnum),foreign key(snum) references salespeople(snum));
+ERROR 1005 (HY000): Can't create table 'cvr.customer' (errno: 150)
+mysql> create table customers(cnum int not null, cname varchar(30) not null,city varchar(30) not null,rating int not null,snum int not null,primary key(cnum),foreign key(snum) references salespeople(snum));
+ERROR 1005 (HY000): Can't create table 'cvr.customers' (errno: 150)
+mysql> show tables;
++---------------+
+| Tables_in_cvr |
++---------------+
+| salesperson   |
+| student       |
+| students      |
++---------------+
+3 rows in set (0.00 sec)
+
+mysql> create table customer(cnum int not null, cname varchar(30) not null,city varchar(30) not null, rating int not null, snum int not null, primary key(cnum), foreign key(snum) references salesperson(snum));
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> insert into customer values(2001,'hoffman','london',100,1001);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into customer values(2002,'giovanni','rome',200,1003);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into customer values(2003,'liu','san rose',200,1002);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into customer values(2004,'grass','berlin',300,1002);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into customer values(2006,'clemens','london',100,1001);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into customer values(2008,'cisneros','san rose',300,1007);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into customer values(2008,'pereira','rome',100,1004);
+ERROR 1062 (23000): Duplicate entry '2008' for key 'PRIMARY'
+mysql> insert into customer values(2007,'pereira','rome',100,1004);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from customer;
++------+----------+----------+--------+------+
+| cnum | cname    | city     | rating | snum |
++------+----------+----------+--------+------+
+| 2001 | hoffman  | london   |    100 | 1001 |
+| 2002 | giovanni | rome     |    200 | 1003 |
+| 2003 | liu      | san rose |    200 | 1002 |
+| 2004 | grass    | berlin   |    300 | 1002 |
+| 2006 | clemens  | london   |    100 | 1001 |
+| 2007 | pereira  | rome     |    100 | 1004 |
+| 2008 | cisneros | san rose |    300 | 1007 |
++------+----------+----------+--------+------+
+7 rows in set (0.00 sec)
+
+mysql> select * from salesperson;
++------+---------+----------+------+
+| snum | sname   | city     | comm |
++------+---------+----------+------+
+| 1001 | peel    | london   | 0.12 |
+| 1002 | serres  | san jose | 0.13 |
+| 1003 | axelrod | new york | 0.10 |
+| 1004 | motika  | london   | 0.11 |
+| 1005 | fran    | london   | 0.26 |
+| 1007 | rifkin  | london   | 0.15 |
++------+---------+----------+------+
+6 rows in set (0.00 sec)
+
+mysql>
